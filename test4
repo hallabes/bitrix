@@ -1,0 +1,61 @@
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+public class CardValidator {
+    public static String validateCard(String cardNumber, String expiryDate, String cvv, String holderName) {
+        // удаляем лишние пробелы
+        cardNumber = cardNumber.replaceAll("\\s+", "");
+        // ВАЛИДАЦИЯ НОМЕРА КАРТЫ
+        if (!cardNumber.matches("\\d{13,19}")) {
+            return "Неверный номер карты (длина должна быть от 13 до 19 цифр)";
+        }
+        if (!checkLuhn(cardNumber)) {
+            return "Неверный номер карты (алгоритм Луна)";
+        }
+        // ВАЛИДАЦИЯ СРОКА ДЕЙСТВИЯ
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/yy");
+            YearMonth expiry = YearMonth.parse(expiryDate, formatter);
+            YearMonth currentMonth = YearMonth.now(); // Текущая дата (2026 год)
+            YearMonth maxExpiry = currentMonth.plusYears(10);
+            if (expiry.isBefore(currentMonth)) {
+                return "Срок действия карты истек";
+            }
+            if (expiry.isAfter(maxExpiry)) {
+                return "Срок действия карты не должен превышать 10 лет от текущей даты";
+            }
+        } catch (DateTimeParseException e) {
+            return "Неверный формат срока действия (ожидается MM/YY)";
+        }
+        // ВАЛИДАЦИЯ CVV
+        if (!cvv.matches("\\d{3,4}")) {
+            return "Неверный формат CVV кода";
+        }
+        // ВАЛИДАЦИЯ ИМЕНИ ДЕРЖАТЕЛЯ
+        if (!holderName.matches("[A-Z\\s]{2,26}")) {
+            return "Неверное имя держателя (только латинские заглавные буквы и пробелы, 2-26 символов)";
+        }
+        return "Карта валидна";
+    }
+    // алгоритм луна
+    private static boolean checkLuhn(String cardNumber) {
+        int sum = 0;
+        boolean alternate = false;
+        for (int i = cardNumber.length() - 1; i >= 0; i--) {
+            int n = Integer.parseInt(cardNumber.substring(i, i + 1));
+            if (alternate) {
+                n *= 2;
+                if (n > 9) {
+                    n = (n % 10) + 1;
+                }
+            }
+            sum += n;
+            alternate = !alternate;
+        }
+        return (sum % 10 == 0);
+    }
+    public static void main(String[] args) {
+        System.out.println(validateCard("4532015112830366", "12/28", "123", "JOHN DOE"));
+        System.out.println(validateCard("4532015112830367", "12/28", "123", "JOHN DOE"));
+    }
+}
