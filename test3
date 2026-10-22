@@ -1,0 +1,34 @@
+import java.util.TreeSet;
+import java.util.stream.Collectors;
+public class BoundaryGenerator {
+    public static String generateBoundaries(Object aObj, Object bObj) {
+        // целые числа или нет
+        if (!(aObj instanceof Integer) || !(bObj instanceof Integer)) {
+            return "Некорректные данные";
+        }
+        int a = (Integer) aObj;
+        int b = (Integer) bObj;
+        if (a > b) {
+            return "Некорректный диапазон";
+        }
+        // удаляем дубликаты и сортируем по возрастанию
+        TreeSet<Integer> boundaries = new TreeSet<>();  
+        boundaries.add(a - 1);
+        boundaries.add(a);
+        boundaries.add(a + 1);
+        boundaries.add(b - 1);
+        boundaries.add(b);
+        boundaries.add(b + 1);
+        // превращаем в строку формата "0, 1, 2, 99, 100, 101"
+        return boundaries.stream()
+                .map(String::valueOf)
+                .collect(Collectors.joining(", "));
+    }
+    public static void main(String[] args) {
+        // проверка
+        System.out.println(generateBoundaries(1, 100)); // выведет: 0, 1, 2, 99, 100, 101
+        System.out.println(generateBoundaries(5, 5));   // выведет: 4, 5, 6
+        System.out.println(generateBoundaries(100, 1)); // выведет: Некорректный диапазон
+        System.out.println(generateBoundaries(1.5, 5)); // выведет: Некорректные данные
+    }
+}
