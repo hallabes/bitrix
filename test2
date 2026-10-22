@@ -1,0 +1,28 @@
+import java.util.Scanner;
+
+public class main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Введите пароль");
+        String pass = scanner.nextLine();
+        //считаем колво символов
+        int countPass = pass.length();
+        //проверяем заглавную
+        boolean uppChar = pass.matches(".*\\p{Lu}.*");
+        //проверсяем спецсимвол
+        boolean spChar = pass.matches(".*[^a-zA-Z0-9а-яА-ЯёЁ]");
+        if (!uppChar || !spChar) {
+            System.out.println("Пароль не соответствует требованиям");
+        } else {
+            if (countPass < 8) {
+                System.out.println("Пароль меньше 8 символов");
+            } else if (countPass >= 8 && countPass <= 10) {
+                System.out.println("Слабый");
+            } else if (countPass >= 11 && countPass <= 15) {
+                System.out.println("Средний");
+            } else if (countPass >= 16) {
+                System.out.println("Надежный");
+            }
+        }
+    }
+}
